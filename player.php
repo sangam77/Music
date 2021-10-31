@@ -22,11 +22,11 @@ function get_random_name($num=6){
 	return $string;
 }
 
-function save_media($filename,$description){
+function save_media($filename,$description,$location){
 	$conn = get_connection();
-	$sql ="INSERT INTO media(`file`,`description`) VALUES(?,?)";
+	$sql ="INSERT INTO media(`file`,`description`,`location`) VALUES(?,?,?)";
 	$query = $conn->prepare($sql);
-	$query->execute([$filename,$description]);
+	$query->execute([$filename,$description,$location]);
 }
 
 function save_playlist($name){
@@ -79,9 +79,11 @@ function get_playlists(){
 
 if(($_SERVER["REQUEST_METHOD"]=="POST") && (isset($_POST['save-media'])))
 {
+   $location=$_POST['location'];
 
-	$uploadDir= "./uploads/";
-	
+	$uploadDir= "uploads/".$location."/";
+
+	echo $uploadDir;
     if(isset($_FILES['file']))
 	{
 
@@ -95,7 +97,8 @@ if(($_SERVER["REQUEST_METHOD"]=="POST") && (isset($_POST['save-media'])))
 	    }
 	    else{
 			move_uploaded_file($_FILES['file']['tmp_name'], $uploadDir.$newFileName);
-			save_media($newFileName,$filename);
+			echo  $uploadDir;
+			save_media($newFileName,$filename,$location);
 			echo "Your file was uploaded successfully";
 	    }
 	}
@@ -147,9 +150,21 @@ if(($_SERVER["REQUEST_METHOD"]=="POST") && (isset($_POST['save-media'])))
 <body>
 <h1>MY MUSIC LIST</h1>
 <form method="post" enctype="multipart/form-data">
+	<select name="location">
+		<option selected value>----Select a uploadlist----</option>
+		<option value="alist">Alist</option>
+		<option value="blist">Blist</option>
+		<option value="clist">Clist</option>
+		<option value="dlist">Dlist</option>
+		<option value="elist">Elist</option>
 	<input type="file" name="file" />
 	<button type="submit" name="save-media">Save Media</button>
+  </select>
 </form>
+
+
+
+
 <h3>Create Playlist</h3>
 <form method="post">
 	<input type="text" name="playlist"/>
